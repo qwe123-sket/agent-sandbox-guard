@@ -1,0 +1,101 @@
+# 工具权限与风险策略
+roles:
+  readonly:
+    allowed_tools:
+      - read_file
+      - list_files
+      - db_query
+      - http_get
+    blocked_paths:
+      - "../"
+      - "/etc"
+      - "C:\\Windows"
+
+  operator:
+    allowed_tools:
+      - read_file
+      - write_file
+      - list_files
+      - db_query
+      - http_get
+      - http_post
+    blocked_paths:
+      - "../"
+      - "/etc"
+
+  admin:
+    allowed_tools:
+      - read_file
+      - write_file
+      - delete_file
+      - list_files
+      - db_query
+      - db_write
+      - http_get
+      - http_post
+    blocked_paths:
+      - "../"
+
+# 高风险操作需人工确认
+hitl_required:
+  - delete_file
+  - db_write
+  - http_post
+
+# 参数校验规则
+parameter_rules:
+  read_file:
+    path:
+      type: string
+      max_length: 512
+      deny_patterns:
+        - "\\.\\."
+        - "^/etc"
+        - "^C:\\\\Windows"
+
+  write_file:
+    path:
+      type: string
+      max_length: 512
+      deny_patterns:
+        - "\\.\\."
+    content:
+      type: string
+      max_length: 65536
+
+  http_get:
+    url:
+      type: string
+      max_length: 2048
+      allow_schemes:
+        - http
+        - https
+      deny_hosts:
+        - 127.0.0.1
+        - localhost
+        - 169.254.169.254
+
+  http_post:
+    url:
+      type: string
+      max_length: 2048
+      allow_schemes:
+        - http
+        - https
+      deny_hosts:
+        - 127.0.0.1
+        - localhost
+
+  db_query:
+    sql:
+      type: string
+      max_length: 4096
+      deny_patterns:
+        - "(?i)\\b(drop|delete|truncate|alter|grant)\\b"
+
+  db_write:
+    sql:
+      type: string
+      max_length: 4096
+      deny_patterns:
+        - "(?i)\\b(drop|truncate|alter|grant)\\b"

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+.idea/
+sandbox/workspace/*
+!sandbox/workspace/.gitkeep
+sandbox/data/*.db
+!sandbox/data/.gitkeep
+logs/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
