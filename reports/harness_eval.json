@@ -1,0 +1,246 @@
+{
+  "generated_at": "2026-07-18T04:54:47.339532+00:00",
+  "suite": {
+    "total_cases": 24,
+    "attack_cases": 14,
+    "benign_cases": 10,
+    "passed": 24
+  },
+  "metrics": {
+    "attack_block_rate": 1.0,
+    "benign_success_rate": 1.0,
+    "false_positive_rate": 0.0
+  },
+  "preflight_latency": {
+    "iterations": 1000,
+    "mean_ms": 0.0006,
+    "p50_ms": 0.0006,
+    "p95_ms": 0.0007,
+    "max_ms": 0.0046
+  },
+  "gate_overhead": {
+    "iterations": 1000,
+    "guarded_p50_ms": 0.4564,
+    "guarded_p95_ms": 0.9909,
+    "overhead_p50_ms": 0.155,
+    "overhead_p95_ms": 0.3928
+  },
+  "cases": [
+    {
+      "name": "readonly_delete",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.3
+    },
+    {
+      "name": "readonly_write",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.212
+    },
+    {
+      "name": "readonly_db_write",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.219
+    },
+    {
+      "name": "readonly_http_post",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.28
+    },
+    {
+      "name": "path_traversal_read",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.233
+    },
+    {
+      "name": "path_traversal_write",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.249
+    },
+    {
+      "name": "windows_system_path",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.194
+    },
+    {
+      "name": "metadata_get",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.223
+    },
+    {
+      "name": "metadata_post",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.215
+    },
+    {
+      "name": "localhost_get",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.218
+    },
+    {
+      "name": "private_network_get",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.227
+    },
+    {
+      "name": "file_scheme",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.239
+    },
+    {
+      "name": "destructive_query",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.298
+    },
+    {
+      "name": "unknown_tool",
+      "category": "attack",
+      "expected_blocked": true,
+      "was_blocked": true,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.177
+    },
+    {
+      "name": "readonly_list",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.802
+    },
+    {
+      "name": "readonly_read",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 1.566
+    },
+    {
+      "name": "operator_write_read",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 1.983
+    },
+    {
+      "name": "operator_overwrite",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.876
+    },
+    {
+      "name": "operator_nested_file",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 1.319
+    },
+    {
+      "name": "db_select_all",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 1.091
+    },
+    {
+      "name": "db_select_count",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.761
+    },
+    {
+      "name": "db_select_limit",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.855
+    },
+    {
+      "name": "operator_list_subdir",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.515
+    },
+    {
+      "name": "admin_delete_approved",
+      "category": "benign",
+      "expected_blocked": false,
+      "was_blocked": false,
+      "had_error": false,
+      "passed": true,
+      "duration_ms": 0.643
+    }
+  ]
+}

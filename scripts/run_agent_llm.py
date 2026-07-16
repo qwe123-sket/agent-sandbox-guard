@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""使用 DeepSeek（OpenAI 兼容）驱动 Agent，工具执行仍经 PermissionGuard。"""
+"""DeepSeek + Agent Harness：模型规划，PermissionGuard 决定是否执行工具。"""
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import uuid
 from pathlib import Path
@@ -11,12 +12,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from langchain_core.messages import HumanMessage, SystemMessage
-
-from agent_guard.agent.llm import create_chat_model, load_llm_settings
-from agent_guard.agent.llm_graph import SYSTEM_PROMPT, build_llm_agent_graph
 from agent_guard.config import load_config, load_policies
 from agent_guard.guard import PermissionGuard
+from agent_guard.harness import (
+    SYSTEM_PROMPT,
+    AgentHarness,
+    HarnessConfig,
+    create_llm_client,
+    load_llm_settings,
+)
 from agent_guard.security import HITLController, PendingApproval
 
 DEFAULT_PROMPT = (
@@ -35,29 +39,27 @@ def cli_approver(pending: PendingApproval) -> bool:
     return answer in {"y", "yes"}
 
 
-def print_trace(messages) -> None:
-    print("\n=== 对话与工具 trace ===")
-    for msg in messages:
-        role = getattr(msg, "type", msg.__class__.__name__)
-        if isinstance(msg, HumanMessage):
-            print(f"[user] {msg.content}")
-        elif isinstance(msg, SystemMessage):
-            continue
-        elif hasattr(msg, "tool_calls") and msg.tool_calls:
-            for call in msg.tool_calls:
-                print(f"[llm -> tool] {call['name']}({call['args']})")
-            if msg.content:
-                print(f"[assistant] {msg.content}")
-        elif hasattr(msg, "content"):
-            prefix = "tool" if role == "tool" else "assistant"
-            print(f"[{prefix}] {msg.content}")
+def print_trace(result) -> None:
+    print("\n=== Harness trace ===")
+    for ev in result.trace:
+        prefix = ev.role
+        if ev.status:
+            prefix = f"{ev.role}/{ev.status}"
+        print(f"[{prefix}] {ev.content}")
+    if result.final_text:
+        print(f"\n[final] {result.final_text}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="LLM Agent（DeepSeek + PermissionGuard）")
+    parser = argparse.ArgumentParser(description="Agent Harness（DeepSeek + PermissionGuard）")
     parser.add_argument("--role", default="operator", choices=["readonly", "operator", "admin"])
     parser.add_argument("--prompt", default=DEFAULT_PROMPT, help="发给 LLM 的任务描述")
     parser.add_argument("--auto-approve", action="store_true", help="跳过高风险人工确认")
+    parser.add_argument("--max-turns", type=int, default=12)
+    parser.add_argument("--max-tool-calls", type=int, default=24)
+    parser.add_argument("--timeout", type=float, default=120.0, help="运行时间预算（秒）")
+    parser.add_argument("--stop-on-block", action="store_true")
+    parser.add_argument("--trace-output", type=Path, help="将结构化 trace 写入 JSON")
     args = parser.parse_args()
 
     config = load_config()
@@ -75,23 +77,36 @@ def main() -> None:
         hitl=hitl,
     )
 
-    llm = create_chat_model(llm_settings)
-    graph = build_llm_agent_graph(guard, llm)
+    llm = create_llm_client(llm_settings)
+    harness = AgentHarness(
+        guard,
+        llm,
+        system_prompt=SYSTEM_PROMPT,
+        config=HarnessConfig(
+            max_turns=args.max_turns,
+            max_tool_calls=args.max_tool_calls,
+            run_timeout_s=args.timeout,
+            stop_on_block=args.stop_on_block,
+        ),
+    )
 
     print(f"模型: {llm_settings.model} @ {llm_settings.base_url}")
     print(f"角色: {args.role}")
     print(f"任务: {args.prompt}\n")
 
-    result = graph.invoke(
-        {
-            "messages": [
-                SystemMessage(content=SYSTEM_PROMPT),
-                HumanMessage(content=args.prompt),
-            ]
-        }
+    result = harness.run(args.prompt)
+    print_trace(result)
+    print(
+        f"\n停止原因: {result.stop_reason} | "
+        f"工具调用: {result.tool_calls} | 耗时: {result.duration_ms:.1f}ms"
     )
-
-    print_trace(result["messages"])
+    if args.trace_output:
+        args.trace_output.parent.mkdir(parents=True, exist_ok=True)
+        args.trace_output.write_text(
+            json.dumps(result.to_dict(), ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"Trace: {args.trace_output}")
     print(f"\n审计日志: {config.audit_log_path}")
 
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from agent_guard.agent import MockPlanner, ToolCallRequest, build_agent_graph
+from agent_guard.harness import MockPlanner, ToolCallRequest, run_mock_harness
 from agent_guard.config import load_config, load_policies
 from agent_guard.guard import PermissionGuard
 from agent_guard.security import HITLController
@@ -95,10 +95,7 @@ def run_attack_case(case: AttackCase, auto_approve_hitl: bool = False) -> dict:
         hitl=hitl,
     )
     planner = MockPlanner(case.calls)
-    graph = build_agent_graph(guard, planner)
-    result = graph.invoke(
-        {"trace": [], "pending_tool": None, "last_result": None, "call_index": 0}
-    )
+    result = run_mock_harness(guard, planner)
 
     blocked_messages = [
         m for m in result["trace"] if m.get("status") == "blocked"

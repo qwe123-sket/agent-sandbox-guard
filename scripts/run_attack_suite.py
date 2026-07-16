@@ -14,7 +14,7 @@ from attack_cases.test_attacks import ATTACK_CASES, run_attack_case
 
 
 def main() -> None:
-    print("Agent 工具调用权限边界 — 攻击用例回归\n")
+    print("Agent Harness — 攻击用例回归\n")
     passed = 0
     for case in ATTACK_CASES:
         result = run_attack_case(case, auto_approve_hitl=False)

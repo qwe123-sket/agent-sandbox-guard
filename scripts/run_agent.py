@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""交互式运行 Agent，演示 HITL 与审计日志。"""
+"""Mock Harness：固定工具序列，演示 HITL 与审计日志。"""
 
 from __future__ import annotations
 
@@ -11,9 +11,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent_guard.agent import MockPlanner, ToolCallRequest, build_agent_graph
 from agent_guard.config import load_config, load_policies
 from agent_guard.guard import PermissionGuard
+from agent_guard.harness import MockPlanner, ToolCallRequest, run_mock_harness
 from agent_guard.security import HITLController, PendingApproval
 
 
@@ -27,7 +27,7 @@ def cli_approver(pending: PendingApproval) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="运行 Agent 权限沙箱")
+    parser = argparse.ArgumentParser(description="运行 Mock Agent Harness")
     parser.add_argument("--role", default="operator", choices=["readonly", "operator", "admin"])
     parser.add_argument("--auto-approve", action="store_true", help="跳过高风险人工确认")
     args = parser.parse_args()
@@ -46,7 +46,6 @@ def main() -> None:
         hitl=hitl,
     )
 
-    # 演示用固定调用序列
     planner = MockPlanner(
         [
             ToolCallRequest("list_files", {"directory": "."}),
@@ -56,10 +55,7 @@ def main() -> None:
         ]
     )
 
-    graph = build_agent_graph(guard, planner)
-    result = graph.invoke(
-        {"trace": [], "pending_tool": None, "last_result": None, "call_index": 0}
-    )
+    result = run_mock_harness(guard, planner)
 
     print("\n=== 执行记录 ===")
     for msg in result["trace"]:

@@ -91,7 +91,7 @@ class GuardDecision:
 
 
 class PermissionGuard:
-    """工具调用前的统一权限网关。"""
+    """Harness Gate：工具调用执行前的统一权限网关（白名单 / 校验 / HITL / 审计）。"""
 
     def __init__(
         self,

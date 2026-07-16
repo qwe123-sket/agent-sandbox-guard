@@ -1,12 +1,23 @@
-from agent_guard.agent.graph import MockPlanner, ToolCallRequest, build_agent_graph
-from agent_guard.agent.llm import create_chat_model, load_llm_settings
-from agent_guard.agent.llm_graph import build_llm_agent_graph
+"""兼容层：请优先 `from agent_guard.harness import ...`。"""
+
+from agent_guard.harness import (
+    SYSTEM_PROMPT,
+    AgentHarness,
+    HarnessResult,
+    MockPlanner,
+    ToolCallRequest,
+    create_llm_client,
+    load_llm_settings,
+    run_mock_harness,
+)
 
 __all__ = [
+    "AgentHarness",
+    "HarnessResult",
+    "SYSTEM_PROMPT",
     "MockPlanner",
     "ToolCallRequest",
-    "build_agent_graph",
-    "build_llm_agent_graph",
-    "create_chat_model",
+    "run_mock_harness",
+    "create_llm_client",
     "load_llm_settings",
 ]

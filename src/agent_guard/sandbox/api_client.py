@@ -17,7 +17,8 @@ def _validate_url(url: str) -> None:
 
 def http_get(url: str, timeout: float = 10.0) -> dict:
     _validate_url(url)
-    with httpx.Client(timeout=timeout, follow_redirects=True) as client:
+    # 禁止自动重定向，避免公网 URL 通过 30x 跳转到内网地址。
+    with httpx.Client(timeout=timeout, follow_redirects=False) as client:
         response = client.get(url)
     return {
         "status_code": response.status_code,
@@ -28,7 +29,7 @@ def http_get(url: str, timeout: float = 10.0) -> dict:
 
 def http_post(url: str, json_body: dict | None = None, timeout: float = 10.0) -> dict:
     _validate_url(url)
-    with httpx.Client(timeout=timeout, follow_redirects=True) as client:
+    with httpx.Client(timeout=timeout, follow_redirects=False) as client:
         response = client.post(url, json=json_body or {})
     return {
         "status_code": response.status_code,

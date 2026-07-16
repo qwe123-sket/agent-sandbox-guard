@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ipaddress
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -97,3 +98,19 @@ class ParameterValidator:
                     "host_denied",
                     f"URL host 被拒绝: {parsed.hostname}",
                 )
+            if rule.get("deny_private_networks", False) and parsed.hostname:
+                try:
+                    address = ipaddress.ip_address(parsed.hostname)
+                except ValueError:
+                    address = None
+                if address and (
+                    address.is_private
+                    or address.is_loopback
+                    or address.is_link_local
+                    or address.is_reserved
+                    or address.is_unspecified
+                ):
+                    raise PolicyViolation(
+                        "private_network_denied",
+                        f"URL 指向非公网地址: {parsed.hostname}",
+                    )
